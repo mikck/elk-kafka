@@ -1,0 +1,32 @@
+version: '2'
+services:
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+    restart: always
+
+  kafka:
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
+    # host name your docker machine ip
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: "192.168.56.100"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    # always restart
+    restart: always
+    volumes:
+      - ./docker.sock:/var/run/docker.sock
+
+  elk:
+    image: sebp/elk:7.10.0
+    ports:
+      - "5601:5601"
+      - "9200:9200"
+      - "5044:5044"
+      - "9300:9300"
+      - "9600:9600"
+    volumes:
+      - ./logstash/conf.d/kafka.conf:/etc/logstash/conf.d/kafka.conf
